@@ -1,9 +1,9 @@
-import React, { useEffect, useRef } from "react";
-import { TextField, Box, Button, Paper } from "@mui/material";
+import React, { useState, useEffect, useRef } from "react";
+import { Typography, TextField, Box, Button, Paper } from "@mui/material";
 import { v4 as genUUID } from "uuid";
 //import Drawflow from "drawflow";
+//import "drawflow/dist/drawflow.min.css";
 import Diagram, { useSchema, createSchema } from "beautiful-react-diagrams";
-import "drawflow/dist/drawflow.min.css";
 import "beautiful-react-diagrams/styles.css";
 
 const initialSchema = createSchema({
@@ -11,7 +11,7 @@ const initialSchema = createSchema({
   links: [],
 });
 
-const AdditionNode = ({ data }) => {
+const AdditionNode = ({ content, inputs, outputs }) => {
   return (
     <Paper elevation={4}>
       <Box sx={{ border: "1px solid red" }}>
@@ -20,33 +20,35 @@ const AdditionNode = ({ data }) => {
             style: { width: "25px", height: "25px", background: "#1B263B" },
           })
         )}
+        {outputs.map((port) =>
+          React.cloneElement(port, {
+            style: { width: "25px", height: "25px", background: "#1B263B" },
+          })
+        )}
       </Box>
-      <TextField
-        defaultValue={0}
-        onChange={(e) => data.onChange(e.target.value)}
-      />
+      <Typography>Sum: {content}</Typography>
     </Paper>
   );
 };
 
-const InputNode = ({ outputs, data, inputs }) => {
+const InputNode = ({ content, outputs, data, inputs }) => {
+  console.log("data.schema: ", data.schema);
   return (
     <Paper elevation={4}>
-      <Box sx={{ border: "1px solid red" }}>
-        {inputs.map((port) =>
-          React.cloneElement(port, {
-            style: { width: "25px", height: "25px", background: "#1B263B" },
-          })
-        )}
-      </Box>
+      {inputs.map((port) =>
+        React.cloneElement(port, {
+          style: { width: "25px", height: "25px", background: "#1B263B" },
+        })
+      )}
       {outputs.map((port) =>
         React.cloneElement(port, {
           style: { width: "25px", height: "25px", background: "#1B263B" },
         })
       )}
+      <Typography>{data.number}</Typography>
       <TextField
         defaultValue={0}
-        onChange={(e) => data.onChange(e.target.value)}
+        onChange={(e) => data.onChange({ number: e.target.value })}
       />
     </Paper>
   );
@@ -69,10 +71,16 @@ export const Flowchart = () => {
       id: genUUID(),
       coordinates: [260, 100],
       render: nodes[nodeType],
-      inputs: [{ id: genUUID() }],
+      inputs: [{ id: genUUID() }, { id: genUUID() }],
+      outputs: [{ id: genUUID() }, { id: genUUID() }],
       data: {
         deleteNode,
-        onChange: (v) => (node.content = +v),
+        number: 0,
+        schema,
+        onChange: (params) => {
+          node.data = { ...node.data, ...params };
+          onChange(schema);
+        },
       },
     };
     addNode(node);
@@ -86,11 +94,11 @@ export const Flowchart = () => {
       >
         Clear
       </Button>
-      <Button variant="contained" onClick={addNewNode}>
-        Add new digit node
+      <Button variant="contained" onClick={() => addNewNode("input")}>
+        Digit
       </Button>
-      <Button variant="outlined" onClick={addNewNode}>
-        Add new arythmetic node
+      <Button variant="outlined" onClick={() => addNewNode("addition")}>
+        Addition
       </Button>
       <Diagram schema={schema} onChange={onChange} />
     </Paper>

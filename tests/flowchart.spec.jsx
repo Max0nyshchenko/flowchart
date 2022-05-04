@@ -1,12 +1,21 @@
 import { render, screen } from "@testing-library/react";
-import { click } from "@testing-library/user-event";
+import userEvent from "@testing-library/user-event";
 import { Flowchart } from "../imports/ui/Flowchart";
 
 describe("Flowchart - component for creating diagramms", () => {
-  it("should create node on click of add node button", () => {
+  beforeEach(() => {
     render(<Flowchart />);
-    const button = screen.getByText("Add new digit node");
-    click(button);
-    expect(screen.getByText("0")).toBeTruthy();
+  });
+
+  it("should create digit node", async () => {
+    await userEvent.click(screen.getByText("Digit"));
+
+    expect(screen.getByDisplayValue("0")).toBeInTheDocument();
+  });
+
+  it("should create addition node", async () => {
+    await userEvent.click(screen.getByText("Addition"));
+
+    expect(screen.getByText("Sum: 0")).toBeInTheDocument();
   });
 });
