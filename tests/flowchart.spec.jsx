@@ -20,3 +20,17 @@ describe("Flowchart - component for creating diagramms", () => {
     expect(screen.getByText("Sum: 0")).toBeInTheDocument();
   });
 });
+
+describe("flowchart.js - schema manipulations, helper methods", () => {
+  describe("findConnections - get links of the node", () => {
+    it("should return first level nodes", () => {
+      const schema = {
+        nodes: [
+          { id: "node-1", inputs: [{ id: "1" }], outputs: [{ id: "a" }] },
+          { id: "node-2", inputs: [{ id: "2" }], outputs: [{ id: "b" }] },
+        ],
+        links: [{ input: "" }],
+      };
+    });
+  });
+});
