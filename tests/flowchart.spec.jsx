@@ -1,10 +1,11 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Flowchart } from "../imports/ui/Flowchart";
+import { SchemaProvider } from "../imports/ui/SchemaProvider";
 
 describe("Flowchart - component for creating diagramms", () => {
   beforeEach(() => {
-    render(<Flowchart />);
+    render(<Flowchart />, { wrapper: SchemaProvider });
   });
 
   it("should create digit node", async () => {
