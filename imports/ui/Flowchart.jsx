@@ -7,11 +7,13 @@ import "beautiful-react-diagrams/styles.css";
 
 export const Flowchart = () => {
   const { schema, clear, addNewNode, onChange } = useFlowchart();
-  console.log("schema", schema);
   return (
     <Paper sx={{ height: 400 }}>
       <Button variant="contained" onClick={clear}>
         Clear
+      </Button>
+      <Button variant="contained" onClick={() => addNewNode("product")}>
+        Product
       </Button>
       <Button variant="contained" onClick={() => addNewNode("input")}>
         Digit
