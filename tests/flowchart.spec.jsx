@@ -4,6 +4,7 @@ import { Flowchart } from "../imports/ui/Flowchart";
 import { SchemaProvider } from "../imports/ui/SchemaProvider";
 import {
   calcDifference,
+  calcQuotient,
   calcProduct,
   calcSum,
   findConnectedNodes,
@@ -58,8 +59,8 @@ const schema = {
 describe("flowchart.js - schema manipulations, helper methods", () => {
   it("should return first level nodes", () => {
     expect(findConnectedNodes(schema, "node-3", true)).toEqual({
-      inputs: [schema.nodes[0]],
-      outputs: [schema.nodes[1]],
+      inputs: [schema.nodes[1]],
+      outputs: [schema.nodes[0]],
     });
   });
 
@@ -81,6 +82,18 @@ describe("flowchart.js - schema manipulations, helper methods", () => {
     );
   });
 
+  it("should return quotient from subtraction", () => {
+    const newSchema = {
+      ...schema,
+      links: [
+        { input: "3", output: "a" },
+        { input: "2", output: "c" },
+      ],
+    };
+
+    expect(calcQuotient(newSchema, "node-3")).toBe(2);
+  });
+
   it("should return difference from subtraction", () => {
     const newSchema = {
       ...schema,
@@ -90,6 +103,6 @@ describe("flowchart.js - schema manipulations, helper methods", () => {
       ],
     };
 
-    expect(calcDifference(newSchema, "node-3")).toBe(2);
+    expect(calcDifference(newSchema, "node-3")).toBe(12);
   });
 });

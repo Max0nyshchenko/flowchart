@@ -35,19 +35,26 @@ export const findConnectedNodes = (schema, nodeId, sorted = false) => {
 
 export const calcSum = (schema, nodeId) => {
   const connectedNodes = findConnectedNodes(schema, nodeId);
-  console.log("anyone", connectedNodes);
-  return connectedNodes.reduce((sum, node) => sum + node.data.number, 0);
+  return connectedNodes.reduce((sum, node) => sum + (node.data.number || 0), 0);
 };
 
 export const calcProduct = (schema, nodeId) => {
   const connectedNodes = findConnectedNodes(schema, nodeId);
-  return connectedNodes.reduce((sum, node) => sum * node.data.number, 1);
+  return connectedNodes.reduce((sum, node) => sum * (node.data.number || 1), 1);
+};
+
+export const calcQuotient = (schema, nodeId) => {
+  const connectedNodes = findConnectedNodes(schema, nodeId, true);
+  return (
+    connectedNodes.inputs.reduce((acc, i) => acc + (i.data.number || 0), 0) /
+    connectedNodes.outputs.reduce((acc, i) => acc + (i.data.number || 0), 0)
+  );
 };
 
 export const calcDifference = (schema, nodeId) => {
   const connectedNodes = findConnectedNodes(schema, nodeId, true);
   return (
-    connectedNodes.inputs.reduce((acc, i) => acc + i.data.number, 0) /
-    connectedNodes.outputs.reduce((acc, i) => acc + i.data.number, 0)
+    connectedNodes.inputs.reduce((acc, i) => acc + (i.data.number || 0), 0) -
+    connectedNodes.outputs.reduce((acc, i) => acc + (i.data.number || 0), 0)
   );
 };
