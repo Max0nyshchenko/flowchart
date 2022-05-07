@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { Flowchart } from "../imports/ui/Flowchart";
-import { SchemaProvider } from "../imports/ui/SchemaProvider";
+import { Flowchart } from "../imports/ui/diagram/Flowchart";
+import { SchemaProvider } from "../imports/ui/context/SchemaProvider";
 import {
   calcDifference,
   calcQuotient,
@@ -16,15 +16,15 @@ describe("Flowchart - component for creating diagramms", () => {
   });
 
   it("should create digit node", async () => {
-    await userEvent.click(screen.getByText("Digit"));
+    await userEvent.click(screen.getByText("input"));
 
-    expect(screen.getByDisplayValue("0")).toBeInTheDocument();
+    expect(screen.getByText("Number goes here")).toBeInTheDocument();
   });
 
   it("should create addition node", async () => {
-    await userEvent.click(screen.getByText("Addition"));
+    await userEvent.click(screen.getByText("addition"));
 
-    expect(screen.getByText("Sum: 0")).toBeInTheDocument();
+    expect(screen.getByText("Result : 0")).toBeInTheDocument();
   });
 });
 

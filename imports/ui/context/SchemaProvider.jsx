@@ -1,13 +1,20 @@
-import React, { useMemo, useContext, createContext, useEffect } from "react";
+import React, { useContext, createContext } from "react";
 import {
   useSchema as useDiagramsSchema,
   createSchema,
 } from "beautiful-react-diagrams";
 import { v4 as genUUID } from "uuid";
-import { InputNode } from "./nodes/Input";
-import { AdditionNode } from "./nodes/Addition";
-import { MultiplicationNode } from "./nodes/Multiplication";
-import { calcProduct, calcSum } from "../lib/flowchart";
+import { InputNode } from "../nodes/Input";
+import { AdditionNode } from "../nodes/Addition";
+import { MultiplicationNode } from "../nodes/Multiplication";
+import { DivisionNode } from "../nodes/Division";
+import { SubtractionNode } from "../nodes/Subtraction";
+import {
+  calcQuotient,
+  calcDifference,
+  calcProduct,
+  calcSum,
+} from "../../lib/flowchart";
 
 const initialSchema = createSchema({
   nodes: [],
@@ -21,8 +28,6 @@ const useSchema = () => useContext(context);
 export const SchemaProvider = ({ children }) => {
   const [schema, { onChange, removeNode, addNode }] =
     useDiagramsSchema(initialSchema);
-
-  console.log("schema: ", schema);
 
   const deleteNode = (id) => {
     const node = schema.nodes.find((i) => i.id === id);
@@ -40,6 +45,8 @@ export const SchemaProvider = ({ children }) => {
           ...node.data,
           sum: calcSum(schema, node.id),
           product: calcProduct(schema, node.id),
+          quotient: calcQuotient(schema, node.id),
+          difference: calcDifference(schema, node.id),
         },
       };
     });
@@ -50,24 +57,35 @@ export const SchemaProvider = ({ children }) => {
     const nodes = {
       input: InputNode,
       addition: AdditionNode,
-      product: MultiplicationNode,
+      multiplication: MultiplicationNode,
+      division: DivisionNode,
+      subtraction: SubtractionNode,
     };
     const node = {
       id: genUUID(),
-      coordinates: [260, 100],
+      coordinates: [
+        !schema.nodes.length
+          ? 250
+          : schema.nodes[schema.nodes.length - 1].coordinates[0] + 150,
+        !schema.nodes.length
+          ? 250
+          : schema.nodes[schema.nodes.length - 1].coordinates[1],
+      ],
       render: nodes[nodeType],
-      inputs: [{ id: genUUID() }, { id: genUUID() }],
-      outputs: [{ id: genUUID() }, { id: genUUID() }],
+      inputs: [{ id: genUUID() }],
+      outputs: [{ id: genUUID() }],
       data: {
         deleteNode,
-        product: 0,
+        multiplication: 0,
+        division: 0,
+        subtraction: 0,
+        addition: 0,
         number: 0,
-        sum: 0,
       },
     };
     addNode(node);
   };
-  const clear = () => onChange({ ...initialSchema });
+  const clear = () => onChange({ nodes: [], links: [] });
 
   return (
     <context.Provider
@@ -85,7 +103,7 @@ export const SchemaProvider = ({ children }) => {
   );
 };
 
-export const useNode = (nodeId, type) => {
+export const useNode = (nodeId) => {
   const { deleteNode, changeNodeData } = useSchema();
 
   return {

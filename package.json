@@ -12,6 +12,7 @@
     "@babel/runtime": "^7.15.4",
     "@emotion/react": "^11.9.0",
     "@emotion/styled": "^11.8.1",
+    "@mui/icons-material": "^5.6.2",
     "@mui/material": "^5.6.3",
     "beautiful-react-diagrams": "^0.5.1",
     "drawflow": "0.0.57",

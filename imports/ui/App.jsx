@@ -1,13 +1,9 @@
 import React from "react";
-import { Box, Typography } from "@mui/material";
-import { Flowchart } from "./Flowchart.jsx";
-import { SchemaProvider } from "./SchemaProvider.jsx";
+import { Flowchart } from "./diagram/Flowchart.jsx";
+import { SchemaProvider } from "./context/SchemaProvider.jsx";
 
 export const App = () => (
-  <Box sx={{ p: 3 }}>
-    <Typography>Hello Flowchart</Typography>
-    <SchemaProvider>
-      <Flowchart />
-    </SchemaProvider>
-  </Box>
+  <SchemaProvider>
+    <Flowchart />
+  </SchemaProvider>
 );

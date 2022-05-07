@@ -1,30 +1,25 @@
 import React, { useState } from "react";
-import { Typography, TextField, Box, Button, Paper } from "@mui/material";
-import { useNode } from "../SchemaProvider.jsx";
+import { IconButton, TextField, Paper } from "@mui/material";
+import { Close as CloseIcon } from "@mui/icons-material";
+import { useNode } from "../context/SchemaProvider.jsx";
+import { InputsOutputs } from "./InputsOutputs";
 
-export const InputNode = ({ outputs, data, inputs, id }) => {
-  const { changeData, deleteNode } = useNode(id, "input");
+export const InputNode = ({ outputs, inputs, id }) => {
+  const { changeData, deleteNode } = useNode(id);
   const [number, setNumber] = useState(0);
+
   return (
-    <Paper elevation={4}>
-      <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-        <Box sx={{ display: "flex", flexDirection: "column" }}>
-          {inputs.map((port) =>
-            React.cloneElement(port, {
-              style: { width: "25px", height: "25px", background: "#1B263B" },
-            })
-          )}
-        </Box>
-        <Box sx={{ display: "flex", flexDirection: "column" }}>
-          {outputs.map((port) =>
-            React.cloneElement(port, {
-              style: { width: "25px", height: "25px", background: "#1B263B" },
-            })
-          )}
-        </Box>
-      </Box>
-      <Typography>{data.number}</Typography>
+    <Paper elevation={4} sx={{ pt: 3 }}>
+      <IconButton
+        size="small"
+        sx={{ position: "absolute", right: -5, top: -5 }}
+        onClick={deleteNode}
+      >
+        <CloseIcon />
+      </IconButton>
+      <InputsOutputs {...{ outputs, inputs, text: "Number goes here" }} />
       <TextField
+        fullWidth
         value={number}
         onChange={(e) => {
           const value = +e.target.value;
