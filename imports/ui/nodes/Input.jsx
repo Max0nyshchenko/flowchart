@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { IconButton, TextField, Paper } from "@mui/material";
 import { Close as CloseIcon } from "@mui/icons-material";
-import { useNode } from "../context/SchemaProvider.jsx";
+import { useNode } from "../context/SchemaProvider";
 import { InputsOutputs } from "./InputsOutputs";
 
 export const InputNode = ({ outputs, inputs, id }) => {

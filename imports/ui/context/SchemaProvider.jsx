@@ -1,14 +1,16 @@
-import React, { useContext, createContext } from "react";
+import React, { useEffect, useContext, createContext } from "react";
 import {
   useSchema as useDiagramsSchema,
   createSchema,
 } from "beautiful-react-diagrams";
 import { v4 as genUUID } from "uuid";
-import { InputNode } from "../nodes/Input";
-import { AdditionNode } from "../nodes/Addition";
-import { MultiplicationNode } from "../nodes/Multiplication";
-import { DivisionNode } from "../nodes/Division";
-import { SubtractionNode } from "../nodes/Subtraction";
+import {
+  InputNode,
+  AdditionNode,
+  MultiplicationNode,
+  DivisionNode,
+  SubtractionNode,
+} from "../nodes";
 import {
   calcQuotient,
   calcDifference,
@@ -34,24 +36,32 @@ export const SchemaProvider = ({ children }) => {
     node && removeNode(node);
   };
 
-  const changeNodeData = (data, nodeId) => {
-    const nodeIndex = schema.nodes.findIndex((t) => t.id === nodeId);
-    if (nodeIndex === -1) return;
-    schema.nodes[nodeIndex].data = { ...schema.nodes[nodeIndex], ...data };
+  const recalculateSchema = () => {
     schema.nodes = schema.nodes.map((node) => {
       return {
         ...node,
         data: {
           ...node.data,
-          sum: calcSum(schema, node.id),
-          product: calcProduct(schema, node.id),
-          quotient: calcQuotient(schema, node.id),
-          difference: calcDifference(schema, node.id),
+          addition: calcSum(schema, node.id),
+          multiplication: calcProduct(schema, node.id),
+          division: calcQuotient(schema, node.id),
+          subtraction: calcDifference(schema, node.id),
         },
       };
     });
     onChange({ ...schema });
   };
+
+  const changeNodeData = (data, nodeId) => {
+    const nodeIndex = schema.nodes.findIndex((t) => t.id === nodeId);
+    if (nodeIndex === -1) return;
+    schema.nodes[nodeIndex].data = { ...schema.nodes[nodeIndex], ...data };
+    recalculateSchema();
+  };
+
+  useEffect(() => {
+    recalculateSchema();
+  }, [schema.links.length]);
 
   const addNewNode = (nodeType) => {
     const nodes = {

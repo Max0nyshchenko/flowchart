@@ -1,9 +1,10 @@
 import React from "react";
-import { Flowchart } from "./diagram/Flowchart.jsx";
-import { SchemaProvider } from "./context/SchemaProvider.jsx";
+import { Flowchart, FlowchartDataViewer } from "./diagrams";
+import { SchemaProvider } from "./context/SchemaProvider";
 
 export const App = () => (
   <SchemaProvider>
     <Flowchart />
+    <FlowchartDataViewer />
   </SchemaProvider>
 );

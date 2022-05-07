@@ -55,6 +55,13 @@ const schema = {
     { input: "3", output: "b" },
   ],
 };
+const secondSchema = {
+  ...schema,
+  links: [
+    { input: "3", output: "a" },
+    { input: "2", output: "c" },
+  ],
+};
 
 describe("flowchart.js - schema manipulations, helper methods", () => {
   it("should return first level nodes", () => {
@@ -82,27 +89,36 @@ describe("flowchart.js - schema manipulations, helper methods", () => {
     );
   });
 
-  it("should return quotient from subtraction", () => {
+  it("should return quotient from division", () => {
+    expect(calcQuotient(secondSchema, "node-3")).toBe(2);
+  });
+
+  it("should return 0 if we divide by 0", () => {
     const newSchema = {
-      ...schema,
-      links: [
-        { input: "3", output: "a" },
-        { input: "2", output: "c" },
-      ],
+      ...secondSchema,
+      nodes: secondSchema.nodes.map((i, idx) => {
+        if (!idx || idx === 1) return { ...i, data: { number: 0 } };
+        return i;
+      }),
     };
 
-    expect(calcQuotient(newSchema, "node-3")).toBe(2);
+    expect(calcQuotient(newSchema, "node-3")).toBe(0);
+  });
+
+  it("should return 0 if nodes is not connected", () => {
+    const newSchema = {
+      ...secondSchema,
+      nodes: secondSchema.nodes.map((i, idx) => {
+        if (!idx || idx === 1) return { ...i, data: { number: 0 } };
+        return i;
+      }),
+      links: [],
+    };
+
+    expect(calcQuotient(newSchema, "node-3")).toBe(0);
   });
 
   it("should return difference from subtraction", () => {
-    const newSchema = {
-      ...schema,
-      links: [
-        { input: "3", output: "a" },
-        { input: "2", output: "c" },
-      ],
-    };
-
-    expect(calcDifference(newSchema, "node-3")).toBe(12);
+    expect(calcDifference(secondSchema, "node-3")).toBe(12);
   });
 });

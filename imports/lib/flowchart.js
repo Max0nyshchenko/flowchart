@@ -33,6 +33,20 @@ export const findConnectedNodes = (schema, nodeId, sorted = false) => {
   return sorted ? sortedNodes : connectedNodes;
 };
 
+const validateNodes = (connectedNodes) => {
+  if (Object.values(connectedNodes).some((i) => !i.length)) return false;
+
+  const num1 = connectedNodes.inputs.reduce(
+    (acc, i) => acc + (i.data.number || 0),
+    0
+  );
+  const num2 = connectedNodes.outputs.reduce(
+    (acc, i) => acc + (i.data.number || 0),
+    0
+  );
+  return num1 && num2;
+};
+
 export const calcSum = (schema, nodeId) => {
   const connectedNodes = findConnectedNodes(schema, nodeId);
   return connectedNodes.reduce((sum, node) => sum + (node.data.number || 0), 0);
@@ -45,6 +59,7 @@ export const calcProduct = (schema, nodeId) => {
 
 export const calcQuotient = (schema, nodeId) => {
   const connectedNodes = findConnectedNodes(schema, nodeId, true);
+  if (!validateNodes(connectedNodes)) return 0;
   return (
     connectedNodes.inputs.reduce((acc, i) => acc + (i.data.number || 0), 0) /
     connectedNodes.outputs.reduce((acc, i) => acc + (i.data.number || 0), 0)
@@ -53,6 +68,7 @@ export const calcQuotient = (schema, nodeId) => {
 
 export const calcDifference = (schema, nodeId) => {
   const connectedNodes = findConnectedNodes(schema, nodeId, true);
+  if (!validateNodes(connectedNodes)) return 0;
   return (
     connectedNodes.inputs.reduce((acc, i) => acc + (i.data.number || 0), 0) -
     connectedNodes.outputs.reduce((acc, i) => acc + (i.data.number || 0), 0)
