@@ -30,7 +30,16 @@ export const findConnectedNodes = (schema, nodeId, sorted = false) => {
     (acc, i) => [...acc, ...i],
     []
   );
-  return sorted ? sortedNodes : connectedNodes;
+  return sorted
+    ? {
+        inputs: sortedNodes.inputs.filter(
+          (t, idx, arr) => idx === arr.findIndex((m) => m.id === t.id)
+        ),
+        outputs: sortedNodes.outputs.filter(
+          (t, idx, arr) => idx === arr.findIndex((m) => m.id === t.id)
+        ),
+      }
+    : connectedNodes;
 };
 
 const getDataSum = (data) =>
@@ -55,12 +64,15 @@ const validateNodes = (connectedNodes) => {
 
 export const calcSum = (schema, nodeId) => {
   const connectedNodes = findConnectedNodes(schema, nodeId);
-  return connectedNodes.reduce((sum, node) => sum + (node.data.number || 0), 0);
+  return connectedNodes.reduce((sum, node) => sum + getDataSum(node.data), 0);
 };
 
 export const calcProduct = (schema, nodeId) => {
   const connectedNodes = findConnectedNodes(schema, nodeId);
-  return connectedNodes.reduce((sum, node) => sum * (node.data.number || 1), 1);
+  return connectedNodes.reduce(
+    (sum, node) => sum * (getDataSum(node.data) || 1),
+    1
+  );
 };
 
 export const calcQuotient = (schema, nodeId) => {

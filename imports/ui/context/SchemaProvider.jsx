@@ -42,10 +42,18 @@ export const SchemaProvider = ({ children }) => {
         ...node,
         data: {
           ...node.data,
-          addition: calcSum(schema, node.id),
-          multiplication: calcProduct(schema, node.id),
-          division: calcQuotient(schema, node.id),
-          subtraction: calcDifference(schema, node.id),
+          ...(node.data.hasOwnProperty("addition") && {
+            addition: calcSum(schema, node.id),
+          }),
+          ...(node.data.hasOwnProperty("multiplication") && {
+            multiplication: calcProduct(schema, node.id),
+          }),
+          ...(node.data.hasOwnProperty("division") && {
+            division: calcQuotient(schema, node.id),
+          }),
+          ...(node.data.hasOwnProperty("addition") && {
+            subtraction: calcDifference(schema, node.id),
+          }),
         },
       };
     });
@@ -86,11 +94,7 @@ export const SchemaProvider = ({ children }) => {
       outputs: [{ id: genUUID() }],
       data: {
         deleteNode,
-        multiplication: 0,
-        division: 0,
-        subtraction: 0,
-        addition: 0,
-        number: 0,
+        [nodeType]: 0,
       },
     };
     addNode(node);

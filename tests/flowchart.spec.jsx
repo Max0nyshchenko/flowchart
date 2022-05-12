@@ -15,7 +15,7 @@ describe("Flowchart - component for creating diagramms", () => {
     render(<Flowchart />, { wrapper: SchemaProvider });
   });
 
-  it("should create digit node", async () => {
+  it("should create input node", async () => {
     await userEvent.click(screen.getByText("input"));
 
     expect(screen.getByText("Number goes here")).toBeInTheDocument();
@@ -28,42 +28,42 @@ describe("Flowchart - component for creating diagramms", () => {
   });
 });
 
-const schema = {
-  nodes: [
-    {
-      data: { number: 24 },
-      id: "node-1",
-      inputs: [{ id: "1" }],
-      outputs: [{ id: "a" }],
-    },
-    {
-      data: { number: 12 },
-      id: "node-2",
-      inputs: [{ id: "2" }],
-      outputs: [{ id: "b" }],
-    },
-    {
-      data: { number: 0 },
-      id: "node-3",
-      inputs: [{ id: "3" }],
-      outputs: [{ id: "c" }],
-    },
-  ],
-  links: [
-    { input: "1", output: "b" },
-    { input: "1", output: "c" },
-    { input: "3", output: "b" },
-  ],
-};
-const secondSchema = {
-  ...schema,
-  links: [
-    { input: "3", output: "a" },
-    { input: "2", output: "c" },
-  ],
-};
-
 describe("flowchart.js - schema manipulations, helper methods", () => {
+  const schema = {
+    nodes: [
+      {
+        data: { number: 24 },
+        id: "node-1",
+        inputs: [{ id: "1" }],
+        outputs: [{ id: "a" }],
+      },
+      {
+        data: { number: 12 },
+        id: "node-2",
+        inputs: [{ id: "2" }],
+        outputs: [{ id: "b" }],
+      },
+      {
+        data: { number: 0 },
+        id: "node-3",
+        inputs: [{ id: "3" }],
+        outputs: [{ id: "c" }],
+      },
+    ],
+    links: [
+      { input: "1", output: "b" },
+      { input: "1", output: "c" },
+      { input: "3", output: "b" },
+    ],
+  };
+  const secondSchema = {
+    ...schema,
+    links: [
+      { input: "3", output: "a" },
+      { input: "2", output: "c" },
+    ],
+  };
+
   const nodesData = [{ addition: 40 }, { subtraction: 4 }, { number: 0 }];
   const nonInputNodesSchema = {
     ...secondSchema,
@@ -73,29 +73,41 @@ describe("flowchart.js - schema manipulations, helper methods", () => {
     })),
   };
 
-  it("should return first level nodes", () => {
+  it("findConnectedNodes - should return first level nodes", () => {
     expect(findConnectedNodes(schema, "node-3", true)).toEqual({
       inputs: [schema.nodes[1]],
       outputs: [schema.nodes[0]],
     });
   });
 
-  it("should return product", () => {
-    expect(calcProduct(schema, "node-3")).toEqual(
-      schema.nodes.reduce(
-        (acc, i) => (i.id !== "node-3" ? acc * i.data.number : acc),
-        1
-      )
-    );
+  describe("calcProduct - method for multiplication node calculations", () => {
+    it("should return product from 2 non-input nodes", () => {
+      expect(calcProduct(nonInputNodesSchema, "node-3")).toBe(160);
+    });
+
+    it("should return product", () => {
+      expect(calcProduct(schema, "node-3")).toEqual(
+        schema.nodes.reduce(
+          (acc, i) => (i.id !== "node-3" ? acc * i.data.number : acc),
+          1
+        )
+      );
+    });
   });
 
-  it("should return connected nodes sum", () => {
-    expect(calcSum(schema, "node-3")).toBe(
-      schema.nodes.reduce(
-        (acc, i) => (i.id !== "node-3" ? acc + i.data.number : acc),
-        0
-      )
-    );
+  describe("calcSum - method for addition node calculations", () => {
+    it("should return connected nodes sum", () => {
+      expect(calcSum(schema, "node-3")).toBe(
+        schema.nodes.reduce(
+          (acc, i) => (i.id !== "node-3" ? acc + i.data.number : acc),
+          0
+        )
+      );
+    });
+
+    it("should return sum from 2 non-input nodes", () => {
+      expect(calcSum(nonInputNodesSchema, "node-3")).toBe(44);
+    });
   });
 
   describe("calcDifference - method for diffrence node calculations", () => {
