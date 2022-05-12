@@ -33,15 +33,21 @@ export const findConnectedNodes = (schema, nodeId, sorted = false) => {
   return sorted ? sortedNodes : connectedNodes;
 };
 
+const getDataSum = (data) =>
+  Object.values(data).reduce(
+    (acc, v) => (typeof v === "number" ? acc + v : acc),
+    0
+  );
+
 const validateNodes = (connectedNodes) => {
   if (Object.values(connectedNodes).some((i) => !i.length)) return false;
 
   const num1 = connectedNodes.inputs.reduce(
-    (acc, i) => acc + (i.data.number || 0),
+    (acc, i) => acc + getDataSum(i.data),
     0
   );
   const num2 = connectedNodes.outputs.reduce(
-    (acc, i) => acc + (i.data.number || 0),
+    (acc, i) => acc + getDataSum(i.data),
     0
   );
   return num1 && num2;
@@ -61,8 +67,8 @@ export const calcQuotient = (schema, nodeId) => {
   const connectedNodes = findConnectedNodes(schema, nodeId, true);
   if (!validateNodes(connectedNodes)) return 0;
   return (
-    connectedNodes.inputs.reduce((acc, i) => acc + (i.data.number || 0), 0) /
-    connectedNodes.outputs.reduce((acc, i) => acc + (i.data.number || 0), 0)
+    connectedNodes.inputs.reduce((acc, i) => acc + getDataSum(i.data), 0) /
+    connectedNodes.outputs.reduce((acc, i) => acc + getDataSum(i.data), 0)
   );
 };
 
@@ -70,7 +76,7 @@ export const calcDifference = (schema, nodeId) => {
   const connectedNodes = findConnectedNodes(schema, nodeId, true);
   if (!validateNodes(connectedNodes)) return 0;
   return (
-    connectedNodes.inputs.reduce((acc, i) => acc + (i.data.number || 0), 0) -
-    connectedNodes.outputs.reduce((acc, i) => acc + (i.data.number || 0), 0)
+    connectedNodes.inputs.reduce((acc, i) => acc + getDataSum(i.data), 0) -
+    connectedNodes.outputs.reduce((acc, i) => acc + getDataSum(i.data), 0)
   );
 };

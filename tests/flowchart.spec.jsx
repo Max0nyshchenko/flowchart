@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { Flowchart } from "../imports/ui/diagram/Flowchart";
+import { Flowchart } from "../imports/ui/diagrams/Flowchart";
 import { SchemaProvider } from "../imports/ui/context/SchemaProvider";
 import {
   calcDifference,
@@ -43,7 +43,7 @@ const schema = {
       outputs: [{ id: "b" }],
     },
     {
-      data: { sum: 0 },
+      data: { number: 0 },
       id: "node-3",
       inputs: [{ id: "3" }],
       outputs: [{ id: "c" }],
@@ -64,6 +64,15 @@ const secondSchema = {
 };
 
 describe("flowchart.js - schema manipulations, helper methods", () => {
+  const nodesData = [{ addition: 40 }, { subtraction: 4 }, { number: 0 }];
+  const nonInputNodesSchema = {
+    ...secondSchema,
+    nodes: secondSchema.nodes.map((n, idx) => ({
+      ...n,
+      data: nodesData[idx],
+    })),
+  };
+
   it("should return first level nodes", () => {
     expect(findConnectedNodes(schema, "node-3", true)).toEqual({
       inputs: [schema.nodes[1]],
@@ -89,36 +98,48 @@ describe("flowchart.js - schema manipulations, helper methods", () => {
     );
   });
 
-  it("should return quotient from division", () => {
-    expect(calcQuotient(secondSchema, "node-3")).toBe(2);
+  describe("calcDifference - method for diffrence node calculations", () => {
+    it("should return difference from subtraction", () => {
+      expect(calcDifference(secondSchema, "node-3")).toBe(12);
+    });
+
+    it("should return difference from 2 non-input nodes", () => {
+      expect(calcDifference(nonInputNodesSchema, "node-3")).toBe(36);
+    });
   });
 
-  it("should return 0 if we divide by 0", () => {
-    const newSchema = {
-      ...secondSchema,
-      nodes: secondSchema.nodes.map((i, idx) => {
-        if (!idx || idx === 1) return { ...i, data: { number: 0 } };
-        return i;
-      }),
-    };
+  describe("calcQuotient - method for division node calculations", () => {
+    it("should return quotient from division", () => {
+      expect(calcQuotient(secondSchema, "node-3")).toBe(2);
+    });
 
-    expect(calcQuotient(newSchema, "node-3")).toBe(0);
-  });
+    it("should return 0 if we divide by 0", () => {
+      const newSchema = {
+        ...secondSchema,
+        nodes: secondSchema.nodes.map((i, idx) => {
+          if (!idx || idx === 1) return { ...i, data: { number: 0 } };
+          return i;
+        }),
+      };
 
-  it("should return 0 if nodes is not connected", () => {
-    const newSchema = {
-      ...secondSchema,
-      nodes: secondSchema.nodes.map((i, idx) => {
-        if (!idx || idx === 1) return { ...i, data: { number: 0 } };
-        return i;
-      }),
-      links: [],
-    };
+      expect(calcQuotient(newSchema, "node-3")).toBe(0);
+    });
 
-    expect(calcQuotient(newSchema, "node-3")).toBe(0);
-  });
+    it("should return 0 if nodes is not connected", () => {
+      const newSchema = {
+        ...secondSchema,
+        nodes: secondSchema.nodes.map((i, idx) => {
+          if (!idx || idx === 1) return { ...i, data: { number: 0 } };
+          return i;
+        }),
+        links: [],
+      };
 
-  it("should return difference from subtraction", () => {
-    expect(calcDifference(secondSchema, "node-3")).toBe(12);
+      expect(calcQuotient(newSchema, "node-3")).toBe(0);
+    });
+
+    it("should return quotient from 2 non-input nodes", () => {
+      expect(calcQuotient(nonInputNodesSchema, "node-3")).toBe(10);
+    });
   });
 });
