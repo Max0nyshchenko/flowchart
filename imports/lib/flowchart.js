@@ -66,10 +66,11 @@ export const calcSum = (schema, nodeId) => {
 
 export const calcProduct = (schema, nodeId) => {
   const connectedNodes = findConnectedNodes(schema, nodeId);
-  return getUniqueNodes([
-    ...connectedNodes.inputs,
-    ...connectedNodes.outputs,
-  ]).reduce(
+  const allNodes = [...connectedNodes.inputs, ...connectedNodes.outputs];
+
+  if (allNodes.length < 2) return 0;
+
+  return getUniqueNodes(allNodes).reduce(
     (sum, node) => sum * (!node.data.freezed ? getDataSum(node.data) : 1),
     1
   );

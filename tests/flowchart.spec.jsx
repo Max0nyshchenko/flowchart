@@ -81,6 +81,12 @@ describe("flowchart.js - schema manipulations, helper methods", () => {
   });
 
   describe("calcProduct - method for multiplication node calculations", () => {
+    it("should return 0 if there is no nodes connected", () => {
+      expect(calcProduct({ ...nonInputNodesSchema, links: [] }, "node-3")).toBe(
+        0
+      );
+    });
+
     it("should return product from 2 non-input nodes", () => {
       expect(calcProduct(nonInputNodesSchema, "node-3")).toBe(160);
     });
