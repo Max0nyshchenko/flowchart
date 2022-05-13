@@ -93,6 +93,44 @@ describe("flowchart.js - schema manipulations, helper methods", () => {
         )
       );
     });
+
+    it("should skip freezed nodes", () => {
+      const schemaWithFreezedNode = {
+        nodes: [
+          {
+            data: { number: 24 },
+            id: "node-1",
+            inputs: [{ id: "1" }],
+            outputs: [{ id: "a" }],
+          },
+          {
+            data: { number: 12 },
+            id: "node-2",
+            inputs: [{ id: "2" }],
+            outputs: [{ id: "b" }],
+          },
+          {
+            data: { number: 13 },
+            id: "node-3",
+            inputs: [{ id: "3" }],
+            outputs: [{ id: "c" }],
+          },
+          {
+            data: { number: 100, freezed: true },
+            id: "node-4",
+            inputs: [{ id: "4" }],
+            outputs: [{ id: "d" }],
+          },
+        ],
+        links: [
+          { input: "2", output: "c" },
+          { input: "4", output: "c" },
+          { input: "3", output: "a" },
+        ],
+      };
+
+      expect(calcProduct(schemaWithFreezedNode, "node-3")).toBe(288);
+    });
   });
 
   describe("calcSum - method for addition node calculations", () => {

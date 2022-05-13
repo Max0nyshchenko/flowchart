@@ -2,8 +2,6 @@ import React from "react";
 import { BasicNode } from "./BasicNode";
 
 export const MultiplicationNode = ({ data, id, inputs, outputs }) => {
-  console.log("multiplication data: ", data);
-
   return (
     <BasicNode
       {...{

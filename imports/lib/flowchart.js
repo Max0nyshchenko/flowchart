@@ -1,4 +1,7 @@
-export const findConnectedNodes = (schema, nodeId, sorted = false) => {
+const getUniqueNodes = (nodes) =>
+  nodes.filter((i, idx, arr) => idx === arr.findIndex((t) => t.id === i.id));
+
+export const findConnectedNodes = (schema, nodeId) => {
   const node = schema.nodes.find(({ id }) => nodeId === id);
   if (!node) return [];
   const sortedNodes = schema.links.reduce(
@@ -26,25 +29,16 @@ export const findConnectedNodes = (schema, nodeId, sorted = false) => {
     },
     { inputs: [], outputs: [] }
   );
-  const connectedNodes = Object.values(sortedNodes).reduce(
-    (acc, i) => [...acc, ...i],
-    []
-  );
-  return sorted
-    ? {
-        inputs: sortedNodes.inputs.filter(
-          (t, idx, arr) => idx === arr.findIndex((m) => m.id === t.id)
-        ),
-        outputs: sortedNodes.outputs.filter(
-          (t, idx, arr) => idx === arr.findIndex((m) => m.id === t.id)
-        ),
-      }
-    : connectedNodes;
+
+  return {
+    inputs: getUniqueNodes(sortedNodes.inputs),
+    outputs: getUniqueNodes(sortedNodes.outputs),
+  };
 };
 
 const getDataSum = (data) =>
   Object.values(data).reduce(
-    (acc, v) => (typeof v === "number" ? acc + v : acc),
+    (acc, v) => (!data.freezed && typeof v === "number" ? acc + v : acc),
     0
   );
 
@@ -64,13 +58,19 @@ const validateNodes = (connectedNodes) => {
 
 export const calcSum = (schema, nodeId) => {
   const connectedNodes = findConnectedNodes(schema, nodeId);
-  return connectedNodes.reduce((sum, node) => sum + getDataSum(node.data), 0);
+  return getUniqueNodes([
+    ...connectedNodes.inputs,
+    ...connectedNodes.outputs,
+  ]).reduce((sum, node) => sum + getDataSum(node.data), 0);
 };
 
 export const calcProduct = (schema, nodeId) => {
   const connectedNodes = findConnectedNodes(schema, nodeId);
-  return connectedNodes.reduce(
-    (sum, node) => sum * (getDataSum(node.data) || 1),
+  return getUniqueNodes([
+    ...connectedNodes.inputs,
+    ...connectedNodes.outputs,
+  ]).reduce(
+    (sum, node) => sum * (!node.data.freezed ? getDataSum(node.data) : 1),
     1
   );
 };
