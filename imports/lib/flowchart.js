@@ -1,4 +1,7 @@
-export const findConnectedNodes = (schema, nodeId, sorted = false) => {
+const getUniqueNodes = (nodes) =>
+  nodes.filter((i, idx, arr) => idx === arr.findIndex((t) => t.id === i.id));
+
+export const findConnectedNodes = (schema, nodeId) => {
   const node = schema.nodes.find(({ id }) => nodeId === id);
   if (!node) return [];
   const sortedNodes = schema.links.reduce(
@@ -26,22 +29,28 @@ export const findConnectedNodes = (schema, nodeId, sorted = false) => {
     },
     { inputs: [], outputs: [] }
   );
-  const connectedNodes = Object.values(sortedNodes).reduce(
-    (acc, i) => [...acc, ...i],
-    []
-  );
-  return sorted ? sortedNodes : connectedNodes;
+
+  return {
+    inputs: getUniqueNodes(sortedNodes.inputs),
+    outputs: getUniqueNodes(sortedNodes.outputs),
+  };
 };
+
+const getDataSum = (data) =>
+  Object.values(data).reduce(
+    (acc, v) => (!data.freezed && typeof v === "number" ? acc + v : acc),
+    0
+  );
 
 const validateNodes = (connectedNodes) => {
   if (Object.values(connectedNodes).some((i) => !i.length)) return false;
 
   const num1 = connectedNodes.inputs.reduce(
-    (acc, i) => acc + (i.data.number || 0),
+    (acc, i) => acc + getDataSum(i.data),
     0
   );
   const num2 = connectedNodes.outputs.reduce(
-    (acc, i) => acc + (i.data.number || 0),
+    (acc, i) => acc + getDataSum(i.data),
     0
   );
   return num1 && num2;
@@ -49,20 +58,30 @@ const validateNodes = (connectedNodes) => {
 
 export const calcSum = (schema, nodeId) => {
   const connectedNodes = findConnectedNodes(schema, nodeId);
-  return connectedNodes.reduce((sum, node) => sum + (node.data.number || 0), 0);
+  return getUniqueNodes([
+    ...connectedNodes.inputs,
+    ...connectedNodes.outputs,
+  ]).reduce((sum, node) => sum + getDataSum(node.data), 0);
 };
 
 export const calcProduct = (schema, nodeId) => {
   const connectedNodes = findConnectedNodes(schema, nodeId);
-  return connectedNodes.reduce((sum, node) => sum * (node.data.number || 1), 1);
+  const allNodes = [...connectedNodes.inputs, ...connectedNodes.outputs];
+
+  if (allNodes.length < 2) return 0;
+
+  return getUniqueNodes(allNodes).reduce(
+    (sum, node) => sum * (!node.data.freezed ? getDataSum(node.data) : 1),
+    1
+  );
 };
 
 export const calcQuotient = (schema, nodeId) => {
   const connectedNodes = findConnectedNodes(schema, nodeId, true);
   if (!validateNodes(connectedNodes)) return 0;
   return (
-    connectedNodes.inputs.reduce((acc, i) => acc + (i.data.number || 0), 0) /
-    connectedNodes.outputs.reduce((acc, i) => acc + (i.data.number || 0), 0)
+    connectedNodes.inputs.reduce((acc, i) => acc + getDataSum(i.data), 0) /
+    connectedNodes.outputs.reduce((acc, i) => acc + getDataSum(i.data), 0)
   );
 };
 
@@ -70,7 +89,7 @@ export const calcDifference = (schema, nodeId) => {
   const connectedNodes = findConnectedNodes(schema, nodeId, true);
   if (!validateNodes(connectedNodes)) return 0;
   return (
-    connectedNodes.inputs.reduce((acc, i) => acc + (i.data.number || 0), 0) -
-    connectedNodes.outputs.reduce((acc, i) => acc + (i.data.number || 0), 0)
+    connectedNodes.inputs.reduce((acc, i) => acc + getDataSum(i.data), 0) -
+    connectedNodes.outputs.reduce((acc, i) => acc + getDataSum(i.data), 0)
   );
 };

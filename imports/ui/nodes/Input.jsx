@@ -24,7 +24,7 @@ export const InputNode = ({ outputs, inputs, id }) => {
         onChange={(e) => {
           const value = +e.target.value;
           if (typeof value === "number" && !Number.isNaN(value)) {
-            changeData({ number: value });
+            changeData({ input: value });
             setNumber(value);
           }
         }}
